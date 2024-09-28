@@ -1,0 +1,9 @@
+name: front
+
+services:
+  front:
+    build: .
+    volumes:
+      - .:/www
+    ports:
+      - 0:80
