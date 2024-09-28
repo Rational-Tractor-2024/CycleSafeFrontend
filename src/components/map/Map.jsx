@@ -1,5 +1,4 @@
 import { MapContainer, Popup, Marker, TileLayer } from 'react-leaflet';
-
 function Map() {
   return (
     <MapContainer
