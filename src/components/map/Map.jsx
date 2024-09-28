@@ -4,12 +4,11 @@ import { useEffect, useState, useRef } from 'react';
 
 const apiKey = 'MRhc4UF0QIXq32ejONQd12W3bu2vGYlL';
 const refreshTimeInMillis = 30000;
-
 function Map() {
   const mapElement = useRef();
   const [map, setMap] = useState({});
-  const [mapLongitude, setMapLongitude] = useState(-121.91599);
-  const [mapLatitude, setMapLatitude] = useState(37.36765);
+  const [mapLongitude, setMapLongitude] = useState(19.944544);
+  const [mapLatitude, setMapLatitude] = useState(50.049683);
   const [mapZoom, setMapZoom] = useState(13);
 
   useEffect(() => {
