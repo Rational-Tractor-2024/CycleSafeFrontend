@@ -3,6 +3,7 @@ import * as tt from '@tomtom-international/web-sdk-maps';
 import { useEffect, useState, useRef } from 'react';
 import NavBar from '../navbar/NavBar';
 import Temperature from '../temperature/Temperature';
+import Route from '../route/Route';
 
 const apiKey = 'MRhc4UF0QIXq32ejONQd12W3bu2vGYlL';
 const refreshTimeInMillis = 30000;
@@ -32,7 +33,9 @@ function Map() {
   return (
     <div>
       <NavBar />
+      
       <div ref={mapElement} className='mapDiv' />
+      <Route/>
       <Temperature />
     </div>
   );
