@@ -14,7 +14,6 @@ const initialState = {
 function Temperature() {
   const [data, setData] = useState(initialState);
   const cityValue = 'Krakow'; // Predefined city
-  console.log(data);
 
   useEffect(() => {
     let url = `https://api.openweathermap.org/data/2.5/weather?q=${cityValue}&appid=${key}&units=metric`;
