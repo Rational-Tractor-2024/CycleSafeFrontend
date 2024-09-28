@@ -46,15 +46,19 @@ function Temperature() {
   }, []);
   return (
     <Card
-      style={{ width: '18rem', position: 'absolute', bottom: 16, left: 16 }}
+      style={{ width: '18rem', position: 'absolute', bottom: 16, right: 16 }}
     >
       <Card.Body>
         <Card.Title>Temperature in {cityValue}</Card.Title>
         <Card.Text>
-          <div>☀️ Temperature: {data.temp}</div>
-          <div>⛅ Feels like: {data.feelsLike}</div>
-          <div>☁️ Pressure {data.pressure}</div>
-          <div>💚 Air Quality {data.pollution}</div>
+          <span style={{ display: 'block' }}>☀️ Temperature: {data.temp}</span>
+          <span style={{ display: 'block' }}>
+            ⛅ Feels like: {data.feelsLike}
+          </span>
+          <span style={{ display: 'block' }}>☁️ Pressure {data.pressure}</span>
+          <span style={{ display: 'block' }}>
+            💚 Air Quality {data.pollution}
+          </span>
         </Card.Text>
         <Button variant='primary'>Reload</Button>
       </Card.Body>
