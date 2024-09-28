@@ -1,23 +1,34 @@
-import { MapContainer, Popup, Marker, TileLayer } from 'react-leaflet';
+import '@tomtom-international/web-sdk-maps/dist/maps.css';
+import * as tt from '@tomtom-international/web-sdk-maps';
+import { useEffect, useState, useRef } from 'react';
+
+const apiKey = 'MRhc4UF0QIXq32ejONQd12W3bu2vGYlL';
+const refreshTimeInMillis = 30000;
+
 function Map() {
-  return (
-    <MapContainer
-      center={[51.505, -0.09]}
-      zoom={13}
-      scrollWheelZoom={false}
-      id='map'
-    >
-      <TileLayer
-        attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-        url='https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png'
-      />
-      <Marker position={[51.505, -0.09]}>
-        <Popup>
-          A pretty CSS3 popup. <br /> Easily customizable.
-        </Popup>
-      </Marker>
-    </MapContainer>
-  );
+  const mapElement = useRef();
+  const [map, setMap] = useState({});
+  const [mapLongitude, setMapLongitude] = useState(-121.91599);
+  const [mapLatitude, setMapLatitude] = useState(37.36765);
+  const [mapZoom, setMapZoom] = useState(13);
+
+  useEffect(() => {
+    let trafficFlowTilesTier = new tt.TrafficFlowTilesTier({
+      key: apiKey,
+      style: '',
+      refresh: refreshTimeInMillis,
+    });
+    let map = tt.map({
+      key: 'MRhc4UF0QIXq32ejONQd12W3bu2vGYlL',
+      container: mapElement.current,
+      center: [mapLongitude, mapLatitude],
+      zoom: mapZoom,
+    });
+    map.addTier(trafficFlowTilesTier);
+    setMap(map);
+    return () => map.remove();
+  }, [mapLongitude, mapLatitude, mapZoom]);
+  return <div ref={mapElement} className='mapDiv' />;
 }
 
 export default Map;
