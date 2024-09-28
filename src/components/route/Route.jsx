@@ -25,9 +25,6 @@ function Route (){
                 placeholder="From..."
                 value={source}
                 onChange={(e)=>{setSource(e.target.value)}}
-                
-                /* aria-label="Username"
-                aria-describedby="basic-addon1" */
             />
             </InputGroup>
 
@@ -37,8 +34,6 @@ function Route (){
                 placeholder="To..."
                 value={target}
                 onChange={(e)=>{setTarget(e.target.value)}}
-                /* aria-label="Username"
-                aria-describedby="basic-addon1" */
             />
             </InputGroup>
 
