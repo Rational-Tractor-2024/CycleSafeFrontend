@@ -1,6 +1,7 @@
 import '@tomtom-international/web-sdk-maps/dist/maps.css';
 import * as tt from '@tomtom-international/web-sdk-maps';
 import { useEffect, useState, useRef } from 'react';
+import NavBar from '../navbar/NavBar';
 
 const apiKey = 'MRhc4UF0QIXq32ejONQd12W3bu2vGYlL';
 const refreshTimeInMillis = 30000;
@@ -27,7 +28,12 @@ function Map() {
     setMap(map);
     return () => map.remove();
   }, [mapLongitude, mapLatitude, mapZoom]);
-  return <div ref={mapElement} className='mapDiv' />;
+  return (
+    <div>
+      <NavBar />
+      <div ref={mapElement} className='mapDiv' />
+    </div>
+  );
 }
 
 export default Map;

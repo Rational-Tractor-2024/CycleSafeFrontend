@@ -12,12 +12,18 @@ code {
     monospace;
 }
 
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
 .mapContainer {
   margin-top: 25px;
 }
 
 .mapDiv {
-  height: 100vh;
+  height: calc(100vh - 56px);
 }
 
 .mapZoomDisplay {
