@@ -33,9 +33,11 @@ function Map() {
     let blue = '#4a90e2';
     let purple = '#4f4ae2';
     let cyan = '#4ad6e2';
+	document.querySelector('#side-menu').classList.add('show-loader')
     await CreateRoute('route1', 'bicycle', 'line', blue);
     await CreateRoute('route2', 'pedestrian', 'line', purple);
     await CreateRoute('route3', 'car', 'line', cyan);
+	document.querySelector('#side-menu').classList.remove('show-loader')
   }
 
   useEffect(() => {

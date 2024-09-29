@@ -41,9 +41,22 @@ function Route({ source, target, setSource, setTarget, onSubmit }) {
 					</div>
 				</div>
 
-				<Button variant='primary' onClick={onSubmit}>
-					Go
-				</Button>
+				<div className='btn-box path-search-btn' onClick={onSubmit}>
+					<div>Search</div>
+					<div className='loader'></div>
+				</div>
+				
+				<div className="best-route mt-5">
+					<div className="h3">Best route</div>
+				</div>
+				
+				<div className="info-1 mt-5">
+					<div>65.2km</div>
+					<div>5h 18min</div>
+				</div>
+				
+				<div className="bottom-icon"></div>
+				
 			</Card.Body>
 		</Card>
 	);

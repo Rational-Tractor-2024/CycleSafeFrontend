@@ -1,37 +1,72 @@
 body {
-  margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-    sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+	margin: 0;
+	font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+		'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+		sans-serif;
+	-webkit-font-smoothing: antialiased;
+	-moz-osx-font-smoothing: grayscale;
 }
 
 code {
-  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
-    monospace;
+	font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
+		monospace;
 }
 
 *,
 *::before,
 *::after {
-  box-sizing: border-box;
+	box-sizing: border-box;
 }
 
 .mapContainer {
-  margin-top: 25px;
+	margin-top: 25px;
 }
 
 .mapDiv {
-  height: calc(100vh - 56px);
+	height: calc(100vh - 56px);
 }
 
 .mapZoomDisplay {
-  margin-left: 10px;
-  margin-right: 10px;
-  margin-top: 5px;
+	margin-left: 10px;
+	margin-right: 10px;
+	margin-top: 5px;
 }
 
 .updateButton {
-  margin-top: 20px;
+	margin-top: 20px;
+}
+
+
+.btn-box {
+	position: relative;
+	display: flex;
+	width: fit-content;
+	height: fit-content;
+	justify-content: center;
+	align-items: center;
+	padding: 8px 24px;
+	border-radius: 12px;
+	border: 1px solid var(--c-font);
+	color: var(--c-font);
+	font-size: 1.2rem;
+	cursor: pointer;
+}
+
+.btn-box:hover {
+	color: var(--c-secondary);
+	border-color: var(--c-primary);
+}
+
+.loader {
+	visibility: hidden;
+	opacity: 0;
+	width: 24px;
+	height: 24px;
+	background: url('/loader.svg') no-repeat center/cover;
+	transition: visibility 400ms, opacity 400ms;
+}
+
+.show-loader .loader {
+	visibility: visible;
+	opacity: 1;
 }
