@@ -17,26 +17,20 @@ function Map() {
   const [target, setTarget] = useState('');
   const listener = useRef();
 
-  function findFirstBuildingLayerId() {
-    var layers = map.getStyle().layers;
-    for (var index in layers) {
-      if (layers[index].type === 'fill-extrusion') {
-        return layers[index].id;
-      }
-    }
-
-    throw new Error(
-      'Map style does not contain any layer with fill-extrusion type.'
-    );
+  async function handleSubmitRoute() {
+    let blue = '#4a90e2';
+    let purple = '#4f4ae2';
+    let cyan = '#4ad6e2';
+    await createRoute('route1', 'bicycle', 'line', blue);
+    await createRoute('route2', 'pedestrian', 'line', purple);
+    await createRoute('route3', 'car', 'line', cyan);
   }
 
-  function handleSubmitRoute() {
-    if (map.getLayer('route')) {
-      map.removeLayer('route');
-      map.removeSource('route');
+  async function createRoute(routeId, travelMode, styleType, styleColor) {
+    if (map.getLayer(routeId)) {
+      map.removeLayer(routeId);
+      map.removeSource(routeId);
     }
-
-    console.log(source, target);
 
     Promise.all([
       !source.includes(',')
@@ -71,25 +65,23 @@ function Map() {
           key: apiKey,
           traffic: false,
           locations: `${sourceLng},${sourceLat}:${targetLng},${targetLat}`,
+          travelMode: travelMode,
         });
       })
       .then(function (response) {
         var geojson = response.toGeoJson();
-        map.addLayer(
-          {
-            id: 'route',
-            type: 'line',
-            source: {
-              type: 'geojson',
-              data: geojson,
-            },
-            paint: {
-              'line-color': '#4a90e2',
-              'line-width': 6,
-            },
+        map.addLayer({
+          id: routeId,
+          type: styleType,
+          source: {
+            type: 'geojson',
+            data: geojson,
           },
-          findFirstBuildingLayerId()
-        );
+          paint: {
+            'line-color': styleColor,
+            'line-width': 6,
+          },
+        });
       });
   }
   useEffect(() => {
