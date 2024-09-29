@@ -1,7 +1,19 @@
 FROM node:22-alpine3.19
 
-WORKDIR /www/
+RUN npm i -g vite
 
-VOLUME ./
+WORKDIR /app
 
-CMD npm create --silent vite@latest
+COPY eslint.config.js .
+COPY vite.config.js .
+COPY package.json .
+
+RUN npm create --silent vite@latest
+
+COPY index.html .
+
+RUN npm i
+
+EXPOSE 5173
+
+CMD ["vite", "--host"]
