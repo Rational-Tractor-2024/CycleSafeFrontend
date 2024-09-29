@@ -8,7 +8,7 @@ function Route({ source, target, setSource, setTarget, onSubmit }) {
 	return (
 		<Card id='side-menu'>
 			<Card.Body>
-				<Card.Title>Create a Route</Card.Title>
+				<div className='h2 mb-4'>Create a Route</div>
 
 
 				<div className='form-box'>
@@ -41,10 +41,10 @@ function Route({ source, target, setSource, setTarget, onSubmit }) {
 					</div>
 				</div>
 
-				<div className='btn-box path-search-btn' onClick={onSubmit}>
+				<button className='btn-box path-search-btn' onClick={onSubmit}>
 					<div>Search</div>
 					<div className='loader'></div>
-				</div>
+				</button>
 				
 				<div className="best-route mt-5">
 					<div className="h3">Best route</div>
