@@ -35,23 +35,38 @@ function Map() {
       map.removeLayer('route');
       map.removeSource('route');
     }
+
+    console.log(source, target);
+
     Promise.all([
-      ts.services.geocode({
-        key: apiKey,
-        query: source,
-      }),
-      ts.services.geocode({
-        key: apiKey,
-        query: target,
-      }),
+      !source.includes(',')
+        ? ts.services.geocode({
+            key: apiKey,
+            query: source,
+          })
+        : Promise.resolve(),
+      !target.includes(',')
+        ? ts.services.geocode({
+            key: apiKey,
+            query: target,
+          })
+        : Promise.resolve(),
     ])
       .then((results) => {
-        const sourceLat = results[0].results[0].position.lat;
-        const sourceLng = results[0].results[0].position.lng;
+        let sourceLat, sourceLng, targetLat, targetLng;
+        if (!results[0]) {
+          [sourceLat, sourceLng] = source.split(',');
+        } else {
+          sourceLat = results[0].results[0].position.lat;
+          sourceLng = results[0].results[0].position.lng;
+        }
 
-        const targetLat = results[1].results[0].position.lat;
-        const targetLng = results[1].results[0].position.lng;
-
+        if (!results[1]) {
+          [targetLat, targetLng] = target.split(',');
+        } else {
+          targetLat = results[1].results[0].position.lat;
+          targetLng = results[1].results[0].position.lng;
+        }
         return ts.services.calculateRoute({
           key: apiKey,
           traffic: false,
