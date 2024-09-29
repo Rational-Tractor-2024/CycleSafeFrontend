@@ -27,7 +27,7 @@ function Temperature() {
         let lat = data.coord.lat;
         let lon = data.coord.lon;
 
-        let airPollutionUrl = `http://api.openweathermap.org/data/2.5/air_pollution?lat=${lat}&lon=${lon}&appid=${key}`;
+        let airPollutionUrl = `https://api.openweathermap.org/data/2.5/air_pollution?lat=${lat}&lon=${lon}&appid=${key}`;
 
         return Promise.all([
           data,
