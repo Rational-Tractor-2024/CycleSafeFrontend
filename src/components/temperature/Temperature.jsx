@@ -50,7 +50,7 @@ export default function Temperature() {
           throw new Error('City not found');
         }
 
-        let airPollutionUrl = `http://api.openweathermap.org/data/2.5/air_pollution?lat=${weatherData.coord.lat}&lon=${weatherData.coord.lon}&appid=${key}`;
+        let airPollutionUrl = `https://api.openweathermap.org/data/2.5/air_pollution?lat=${weatherData.coord.lat}&lon=${weatherData.coord.lon}&appid=${key}`;
 
         return Promise.all([
           weatherData,
