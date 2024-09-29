@@ -17,6 +17,11 @@ function Map() {
   const [target, setTarget] = useState('');
   let popup;
 
+  let mousePopupOpenOrigin = {
+    x: 0,
+    y: 0
+  };
+
   function findFirstBuildingLayerId() {
     var layers = map.getStyle().layers;
     for (var index in layers) {
@@ -173,11 +178,22 @@ function Map() {
       },
     );
     map.on('mouseover', routeId, onPopupTrigger);
-    map.on('mouseout', routeId, console.log);
     //createPopup(summary, lngLat);
   }
 
+  
+  function checkPopupShouldClose(e) {
+    console.log('check popup should close', e, mousePopupOpenOrigin);
+    let distance = (mousePopupOpenOrigin.x - e.clientX)**2 + (mousePopupOpenOrigin.y - e.clientY)**2;
+    if(distance > 2000 && e.target.closest('.mapboxgl-popup-content') === null) {
+      if(popup) popup.remove();
+      window.removeEventListener('mousemove', checkPopupShouldClose);
+      console.log('distance grater - closing');
+    }
+  }
+
   function onPopupTrigger(event) {
+    console.log(event);
     //infoHint.hide();
     if (popup) {
       popup.remove();
@@ -185,10 +201,14 @@ function Map() {
     var feature = JSON.parse(event.features[0].properties.summary);
 
     createPopup(feature, event.lngLat);
+    window.removeEventListener('mousemove', checkPopupShouldClose);
+    mousePopupOpenOrigin.x = event.originalEvent.clientX;
+    mousePopupOpenOrigin.y = event.originalEvent.clientY;
+    window.addEventListener('mousemove', checkPopupShouldClose);
   }
 
   function createPopup(feature, lngLat) {
-    popup = new tt.Popup({ className: 'tt-popup', offset: [0, 18] })
+    popup = new tt.Popup({ className: 'tt-popup', offset: [0, 0] })
       .setLngLat(lngLat)
       .setHTML(
         '<div class="tt-pop-up-container">' +
