@@ -177,22 +177,22 @@ function Map() {
         },
       },
     );
-    map.on('mouseover', routeId, onPopupTrigger);
+    map.on('mouseover', routeId, (e) => { onPopupTrigger(e, travelMode) });
     //createPopup(summary, lngLat);
   }
 
-  
+
   function checkPopupShouldClose(e) {
     console.log('check popup should close', e, mousePopupOpenOrigin);
-    let distance = (mousePopupOpenOrigin.x - e.clientX)**2 + (mousePopupOpenOrigin.y - e.clientY)**2;
-    if(distance > 2000 && e.target.closest('.mapboxgl-popup-content') === null) {
-      if(popup) popup.remove();
+    let distance = (mousePopupOpenOrigin.x - e.clientX) ** 2 + (mousePopupOpenOrigin.y - e.clientY) ** 2;
+    if (distance > 2000 && e.target.closest('.mapboxgl-popup-content') === null) {
+      if (popup) popup.remove();
       window.removeEventListener('mousemove', checkPopupShouldClose);
       console.log('distance grater - closing');
     }
   }
 
-  function onPopupTrigger(event) {
+  function onPopupTrigger(event, modeOfTransport) {
     console.log(event);
     //infoHint.hide();
     if (popup) {
@@ -200,31 +200,39 @@ function Map() {
     }
     var feature = JSON.parse(event.features[0].properties.summary);
 
-    createPopup(feature, event.lngLat);
+    createPopup(feature, event.lngLat, modeOfTransport);
     window.removeEventListener('mousemove', checkPopupShouldClose);
     mousePopupOpenOrigin.x = event.originalEvent.clientX;
     mousePopupOpenOrigin.y = event.originalEvent.clientY;
     window.addEventListener('mousemove', checkPopupShouldClose);
   }
 
-  function createPopup(feature, lngLat) {
+  function secondsToTime(secs) {
+    return `${parseInt(secs / 3600)}h ${parseInt(secs % 3600 / 60)}`;
+  }
+  function parseMeters(m) {
+    return `${parseFloat(m / 1000).toFixed(3)}km`;
+  }
+
+  function createPopup(feature, lngLat, modeOfTransport) {
     popup = new tt.Popup({ className: 'tt-popup', offset: [0, 0] })
       .setLngLat(lngLat)
-      .setHTML(
-        '<div class="tt-pop-up-container">' +
-        '<div class="pop-up-content -small">' +
-        '<div class="pop-up-result-address">' +
-        'Distance: ' + feature.lengthInMeters +
-        '</div>' +
-        '<div class="pop-up-result-address">' +
-        'Estimated travel time: ' +
-        feature.travelTimeInSeconds +
-        '</div>' +
-        '<div class="pop-up-result-address">' +
-        'Traffic delay: ' + feature.trafficDelayInSeconds +
-        '</div>' +
-        '</div>' +
-        '</div>'
+      .setHTML(`
+        <div class="h2">${modeOfTransport}</div>
+        <div class="tt-pop-up-container">
+        <div class="pop-up-content -small">
+        <div class="pop-up-result-address">
+        Distance: ${parseMeters(feature.lengthInMeters)}
+        </div>
+        <div class="pop-up-result-address">
+        Estimated travel time:  
+        ${secondsToTime(feature.travelTimeInSeconds)}
+        </div>
+        <div class="pop-up-result-address">
+        Traffic delay: ${secondsToTime(feature.trafficDelayInSeconds)}
+        </div>
+        </div>
+        </div>`
       )
       .setMaxWidth('none');
     // popup.addEventListener("onmouseleave", (e) => {
