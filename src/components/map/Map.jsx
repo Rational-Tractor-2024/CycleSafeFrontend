@@ -9,12 +9,13 @@ import Route from '../route/Route';
 const apiKey = 'MRhc4UF0QIXq32ejONQd12W3bu2vGYlL';
 function Map() {
   const mapElement = useRef();
-  const [map, setMap] = useState({});
+  const [map, setMap] = useState(null);
   const [mapLongitude, setMapLongitude] = useState(19.944544);
   const [mapLatitude, setMapLatitude] = useState(50.049683);
   const [mapZoom, setMapZoom] = useState(13);
   const [source, setSource] = useState('');
   const [target, setTarget] = useState('');
+  const listener = useRef();
 
   function findFirstBuildingLayerId() {
     var layers = map.getStyle().layers;
@@ -45,7 +46,6 @@ function Map() {
       }),
     ])
       .then((results) => {
-        console.log(results);
         const sourceLat = results[0].results[0].position.lat;
         const sourceLng = results[0].results[0].position.lng;
 
@@ -77,74 +77,36 @@ function Map() {
         );
       });
   }
-
   useEffect(() => {
-    function removeLayer(layerId) {
-      if (map?.getLayer(layerId)) {
-        map.removeLayer(layerId);
-        map.removeSource(layerId);
+    function handleMapClick(e) {
+      const { lat, lng } = e.lngLat;
+      if (!source) {
+        setSource(`${lat},${lng}`);
+      } else if (!target) {
+        setTarget(`${lat},${lng}`);
       }
     }
-
-    function findFirstBuildingLayerId() {
-      var layers = map.getStyle().layers;
-      for (var index in layers) {
-        if (layers?.[index].type === 'fill-extrusion') {
-          return layers[index].id;
-        }
-      }
-
-      throw new Error(
-        'Map style does not contain any layer with fill-extrusion type.'
-      );
+    let m = map;
+    if (!m) {
+      m = tt.map({
+        key: apiKey,
+        container: mapElement.current,
+        center: [mapLongitude, mapLatitude],
+        zoom: mapZoom,
+        stylesVisibility: {
+          trafficIncidents: true,
+          trafficFlow: true,
+        },
+      });
     }
 
-    let map = tt.map({
-      key: apiKey,
-      container: mapElement.current,
-      center: [mapLongitude, mapLatitude],
-      zoom: mapZoom,
-      stylesVisibility: {
-        trafficIncidents: true,
-        trafficFlow: true,
-      },
-    });
+    m.once('click', handleMapClick);
 
-    removeLayer('route');
+    setMap(m);
 
-    const routePoints = {
-      start: [19.944544, 50.049683],
-      finish: [20.04758, 50.073377],
-    };
+    return;
+  }, [mapLongitude, mapLatitude, mapZoom, listener, source, target, map]);
 
-    // ts.services
-    //   .calculateRoute({
-    //     key: apiKey,
-    //     traffic: false,
-    //     locations: [routePoints.start, routePoints.finish],
-    //   })
-    //   .then(function (response) {
-    //     var geojson = response.toGeoJson();
-    //     map.addLayer(
-    //       {
-    //         id: 'route',
-    //         type: 'line',
-    //         source: {
-    //           type: 'geojson',
-    //           data: geojson,
-    //         },
-    //         paint: {
-    //           'line-color': '#4a90e2',
-    //           'line-width': 6,
-    //         },
-    //       },
-    //       findFirstBuildingLayerId()
-    //     );
-    //   });
-
-    setMap(map);
-    return () => map.remove();
-  }, [mapLongitude, mapLatitude, mapZoom]);
   return (
     <div>
       <NavBar />
