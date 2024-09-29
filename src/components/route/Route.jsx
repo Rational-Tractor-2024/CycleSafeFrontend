@@ -51,8 +51,8 @@ function Route({ source, target, setSource, setTarget, onSubmit }) {
 				</div>
 				
 				<div className="info-1 mt-5">
-					<div>65.2km</div>
-					<div>5h 18min</div>
+					<div><span className="route-distance">...</span>km</div>
+					<div><span className="route-time">--h --min</span></div>
 				</div>
 				
 				<div className="bottom-icon"></div>
