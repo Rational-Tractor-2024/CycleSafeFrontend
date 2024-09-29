@@ -15,6 +15,7 @@ function Map() {
   const [mapZoom, setMapZoom] = useState(13);
   const [source, setSource] = useState('');
   const [target, setTarget] = useState('');
+  let popup;
 
   function findFirstBuildingLayerId() {
     var layers = map.getStyle().layers;
@@ -150,7 +151,13 @@ function Map() {
       locations: `${sourceLng},${sourceLat}:${targetLng},${targetLat}`,
       travelMode: travelMode,
     });
+
     var geojson = factory.toGeoJson();
+    let features = factory.toGeoJson().features;
+    let summary = features[0].properties.summary;
+    let coordinates = features[0].geometry.coordinates;
+    let lngLat = coordinates[Math.floor(coordinates.length / 2)];
+
     await map.addLayer(
       {
         id: routeId,
@@ -165,6 +172,47 @@ function Map() {
         },
       },
     );
+    map.on('mouseover', routeId, onPopupTrigger);
+    map.on('mouseout', routeId, console.log);
+    //createPopup(summary, lngLat);
+  }
+
+  function onPopupTrigger(event) {
+    //infoHint.hide();
+    if (popup) {
+      popup.remove();
+    }
+    var feature = JSON.parse(event.features[0].properties.summary);
+
+    createPopup(feature, event.lngLat);
+  }
+
+  function createPopup(feature, lngLat) {
+    popup = new tt.Popup({ className: 'tt-popup', offset: [0, 18] })
+      .setLngLat(lngLat)
+      .setHTML(
+        '<div class="tt-pop-up-container">' +
+        '<div class="pop-up-content -small">' +
+        '<div class="pop-up-result-address">' +
+        'Distance: ' + feature.lengthInMeters +
+        '</div>' +
+        '<div class="pop-up-result-address">' +
+        'Estimated travel time: ' +
+        feature.travelTimeInSeconds +
+        '</div>' +
+        '<div class="pop-up-result-address">' +
+        'Traffic delay: ' + feature.trafficDelayInSeconds +
+        '</div>' +
+        '</div>' +
+        '</div>'
+      )
+      .setMaxWidth('none');
+    // popup.addEventListener("onmouseleave", (e) => {
+    //   if (popup) {
+    //     popup.remove();
+    //   }
+    // });
+    popup.addTo(map);
   }
 }
 
