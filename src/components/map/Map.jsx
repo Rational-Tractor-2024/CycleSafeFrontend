@@ -9,104 +9,111 @@ import Route from '../route/Route';
 const apiKey = 'MRhc4UF0QIXq32ejONQd12W3bu2vGYlL';
 function Map() {
   const mapElement = useRef();
-  const [map, setMap] = useState({});
+  const [map, setMap] = useState(null);
   const [mapLongitude, setMapLongitude] = useState(19.944544);
   const [mapLatitude, setMapLatitude] = useState(50.049683);
   const [mapZoom, setMapZoom] = useState(13);
   const [source, setSource] = useState('');
   const [target, setTarget] = useState('');
-
-  function findFirstBuildingLayerId() {
-    var layers = map.getStyle().layers;
-    for (var index in layers) {
-      if (layers[index].type === 'fill-extrusion') {
-        return layers[index].id;
-      }
-    }
-
-    throw new Error(
-      'Map style does not contain any layer with fill-extrusion type.'
-    );
-  }
+  const listener = useRef();
 
   async function handleSubmitRoute() {
     let blue = '#4a90e2';
     let purple = '#4f4ae2';
     let cyan = '#4ad6e2';
-    await CreateRoute('route1', 'bicycle', 'line', blue);
-    await CreateRoute('route2', 'pedestrian', 'line', purple);
-    await CreateRoute('route3', 'car', 'line', cyan);
+    await createRoute('route1', 'bicycle', 'line', blue);
+    await createRoute('route2', 'pedestrian', 'line', purple);
+    await createRoute('route3', 'car', 'line', cyan);
   }
 
-  useEffect(() => {
-    function removeLayer(layerId) {
-      if (map?.getLayer(layerId)) {
-        map.removeLayer(layerId);
-        map.removeSource(layerId);
-      }
+  async function createRoute(routeId, travelMode, styleType, styleColor) {
+    if (map.getLayer(routeId)) {
+      map.removeLayer(routeId);
+      map.removeSource(routeId);
     }
 
-    // function findFirstBuildingLayerId() {
-    //   var layers = map.getStyle().layers;
-    //   for (var index in layers) {
-    //     if (layers?.[index].type === 'fill-extrusion') {
-    //       return layers[index].id;
-    //     }
-    //   }
+    Promise.all([
+      !source.includes(',')
+        ? ts.services.geocode({
+            key: apiKey,
+            query: source,
+          })
+        : Promise.resolve(),
+      !target.includes(',')
+        ? ts.services.geocode({
+            key: apiKey,
+            query: target,
+          })
+        : Promise.resolve(),
+    ])
+      .then((results) => {
+        let sourceLat, sourceLng, targetLat, targetLng;
+        if (!results[0]) {
+          [sourceLat, sourceLng] = source.split(',');
+        } else {
+          sourceLat = results[0].results[0].position.lat;
+          sourceLng = results[0].results[0].position.lng;
+        }
 
-    //   throw new Error(
-    //     'Map style does not contain any layer with fill-extrusion type.'
-    //   );
-    // }
+        if (!results[1]) {
+          [targetLat, targetLng] = target.split(',');
+        } else {
+          targetLat = results[1].results[0].position.lat;
+          targetLng = results[1].results[0].position.lng;
+        }
+        return ts.services.calculateRoute({
+          key: apiKey,
+          traffic: false,
+          locations: `${sourceLng},${sourceLat}:${targetLng},${targetLat}`,
+          travelMode: travelMode,
+        });
+      })
+      .then(function (response) {
+        var geojson = response.toGeoJson();
+        map.addLayer({
+          id: routeId,
+          type: styleType,
+          source: {
+            type: 'geojson',
+            data: geojson,
+          },
+          paint: {
+            'line-color': styleColor,
+            'line-width': 6,
+          },
+        });
+      });
+  }
+  useEffect(() => {
+    function handleMapClick(e) {
+      const { lat, lng } = e.lngLat;
+      if (!source) {
+        setSource(`${lat},${lng}`);
+      } else if (!target) {
+        setTarget(`${lat},${lng}`);
+      }
+    }
+    let m = map;
+    if (!m) {
+      m = tt.map({
+        key: apiKey,
+        container: mapElement.current,
+        center: [mapLongitude, mapLatitude],
+        zoom: mapZoom,
+        stylesVisibility: {
+          trafficIncidents: true,
+          trafficFlow: true,
+        },
+      });
+    }
 
-    let map = tt.map({
-      key: apiKey,
-      container: mapElement.current,
-      center: [mapLongitude, mapLatitude],
-      zoom: mapZoom,
-      stylesVisibility: {
-        trafficIncidents: true,
-        trafficFlow: true,
-      },
-    });
+    m.once('click', handleMapClick);
 
-    removeLayer('route1');
-    removeLayer('route2');
-    removeLayer('route3');
+    setMap(m);
 
-    const routePoints = {
-      start: [19.944544, 50.049683],
-      finish: [20.04758, 50.073377],
-    };
+    return;
+  }, [mapLongitude, mapLatitude, mapZoom, listener, source, target, map]);
 
-    // ts.services
-    //   .calculateRoute({
-    //     key: apiKey,
-    //     traffic: false,
-    //     locations: [routePoints.start, routePoints.finish],
-    //   })
-    //   .then(function (response) {
-    //     var geojson = response.toGeoJson();
-    //     map.addLayer(
-    //       {
-    //         id: 'route',
-    //         type: 'line',
-    //         source: {
-    //           type: 'geojson',
-    //           data: geojson,
-    //         },
-    //         paint: {
-    //           'line-color': '#4a90e2',
-    //           'line-width': 6,
-    //         },
-    //       },
-    //       findFirstBuildingLayerId()
-    //     );
-    //   });
-
-    setMap(map);
-    return () => map.remove();
-  }, [mapLongitude, mapLatitude, mapZoom]);
   return (
     <div>
       <NavBar />
@@ -122,50 +129,6 @@ function Map() {
       <Temperature />
     </div>
   );
-
-  async function CreateRoute(routeId, travelMode, styleType, styleColor) {
-    if (map.getLayer(routeId)) {
-      map.removeLayer(routeId);
-      map.removeSource(routeId);
-    }
-    let results = await Promise.all([
-      ts.services.geocode({
-        key: apiKey,
-        query: source,
-      }),
-      ts.services.geocode({
-        key: apiKey,
-        query: target,
-      }),
-    ])
-    console.log(results);
-    const sourceLat = results[0].results[0].position.lat;
-    const sourceLng = results[0].results[0].position.lng;
-
-    const targetLat = results[1].results[0].position.lat;
-    const targetLng = results[1].results[0].position.lng;
-    let factory = await ts.services.calculateRoute({
-      key: apiKey,
-      traffic: false,
-      locations: `${sourceLng},${sourceLat}:${targetLng},${targetLat}`,
-      travelMode: travelMode,
-    });
-    var geojson = factory.toGeoJson();
-    await map.addLayer(
-      {
-        id: routeId,
-        type: styleType,
-        source: {
-          type: 'geojson',
-          data: geojson,
-        },
-        paint: {
-          'line-color': styleColor,
-          'line-width': 6,
-        },
-      },
-    );
-  }
 }
 
 export default Map;
